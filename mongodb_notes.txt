@@ -1,0 +1,109 @@
+MongoDB Notes
+=============
+Week1
+-----
+1. 	$ show dbs 				
+	//to show databases
+    
+2. 	$ use <db-name>			
+	//to use the database
+    
+3. 	$ show collections		
+	//to show all the collections in database
+    
+4. 	$ 
+
+Week4
+-----
+1. 	Index: 	Used to enhance the performance of the query.
+			Used to reduce the search criteria.
+            Used on those attribute who has large number of data with distict values.
+	
+    Index Cardinality:	It shows the index points. It is of three type
+    	Regular:	1:1
+        Sparse:		< no of docs
+        Multikey:	> no of docs[size of the sub doc array]
+    
+    Index efficiency:	Not efficient with  $gt, $lt, $ne, $regex
+        
+2. 	$ db.<collection-name>.ensureIndex({<attribute-name>:1})					
+   	//to create index for given attribute-name
+    
+3. 	$ db.<collection-name>.ensureIndex({<attr-name>.<sub-doc-attr-name>:1})	
+   	//to create index for multikey
+    
+4. 	$ db.<collection-name>.ensureIndex({<attr-name>:1},{'unique':1})			
+   	//to create index with unique value. it will remove the duplicate documents if exists
+    
+5. 	$ db.<collection-name>.ensureIndex({<attr-name>:1},{'unique':1, 'sparse':1})						
+   	//to create index with unique value and sparse. it will allow to create index if in some docs attr-name is not 
+     there duplicate documents if exists
+     
+6. 	$ db.<collection-name>.ensureIndex({<attr-name>:1},{'unique':1, 'sparse':1, 'background':1})						
+   	//to create index with unique value and sparse in background. 
+      background: it will allow writers to write
+      foreground: it will stop writers to write till index creation
+      
+7. 	$ db.<collection-name>.getIndexes()										
+   	//to get all indexes in the given collection-name
+    
+8. 	$ db.system.indexs.find()												
+   	//to get all indexes in the database
+    
+9. 	$ db.<collection-name>.find({}).explain()
+	//to show that how query works in database.
+    
+10. $ db.<collection-name>.stats()
+	//to show the statistics of collections which will also show the size of indexes
+
+11. $ db.<collection-name>.find({}).hint({<index-name>:1})
+	//to hind the query that please use this index to search
+
+12. $ db.<collection-name>.find({<attr-name>:{$near:[x,y]}})
+	//to find near docs in 2d where x and y are the cordinated in 2d
+
+13. $ db.stores.find({
+                        <attr-name>:{
+                            $near:{
+                                $geometry:{
+                                    "type":"Point",
+                                    "coordinates":[x,y]
+                                },
+                                $maxDistance:1000000
+                            }
+                        }
+                    })
+	//to find near docs in 2dsphere where x is longitude and y is latitude
+    
+14. $ db.<collection-name>.find( { $text : { $search : "sample text data" } } )
+	//to find the docs having doc with text given
+   
+15. $ db.getProfilingLevel()
+	//to get the profiling level
+    	0: no logging profiler is off
+        1: log slow query who have query time >100ms
+		2: log all query
+
+16. $ db.setProfilingStatus()
+	//to show the profiling status with profiling level and profiling time in millis
+    
+16. $ db.setProfilingLevel(1)
+	//to set the profiling level as 1
+
+17. $ db.setProfilingLevel(1,4)
+	//to set the profiling level as 1 and log only those query who has query time > 4ms
+    
+18. $ db.system.profile.find()
+	//to get the logs, logged by profiler
+    
+19. $ db.system.profile.find({ns:/<db-name>.<collection-name>/}).sort({ts:1})
+	//to get the logs from given collection-name in given db-name and sorted by timestamp
+    
+20. $ db.system.profile.find({millis:{$gt:100}}).sort({ts:1})
+	//to get the logs which has execution time > 100ms and sorted by timestamp
+    
+21. $ mongotop 
+	//Is the command to look over mongodb that on which db it spend most of the time
+
+22. $ mongostat
+	//Is the command to get the statistics of mongodb per second
