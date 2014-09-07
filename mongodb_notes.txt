@@ -11,7 +11,7 @@ Week1
 3. 	$ show collections		
 	//to show all the collections in database
     
-4. 	$ 
+
 
 Week4
 -----
