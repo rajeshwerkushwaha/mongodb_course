@@ -1,0 +1,42 @@
+db.posts.aggregate([
+{$unwind:'$comments'},
+{$group:{
+	_id:"$comments.author",
+    total_comment:{$sum:1}
+}}
+{$sort: { total: -1 } }
+])
+
+db.posts.aggregate([{$unwind:'$comments'},{$group:{	_id:"$comments.author",total_comment:{$sum:1}}}{$sort: { total: -1 } }])
+
+=====
+
+db.grades.aggregate([
+{ $match: { pop: {$gt:25000}, state: {'CT','NJ'} } },
+{
+  $group:{
+	_id:{
+         state:"$state",
+         city:"$city"
+        },
+    total_pop:{$sum:"pop"}
+	}
+},
+{
+  $group:{
+	_id:{
+         state:"$state"
+        },
+    total_pop:{$sum:"pop"}
+	}
+}
+])
+
+db.grades.aggregate([{$group:{_id:{'$state', '$city'},total_pop:{$sum:'$pop'}}])
+
+db.grades.aggregate([{ $match: { pop: {$gt:25000} } },{$group:{_id:{_id:"$_id", city:"$city"},total_pop:{$sum:"$pop"}}}])
+
+db.grades.aggregate([{$group:{_id:{state:"$state",city:"$city"},total_pop:{$sum:{{$gt:{"$pop":25000}}}}}])
+
+db.grades.aggregate([{$group:{_id:{state:"$state",city:"$city"},total_pop:{$gt:{"pop":25000}}}}])
+

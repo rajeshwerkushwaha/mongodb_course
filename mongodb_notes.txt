@@ -1,7 +1,7 @@
 MongoDB Notes
 =============
-Week1
------
+Week 1 & 2
+----------
 1. 	$ show dbs 				
 	//to show databases
     
@@ -10,11 +10,115 @@ Week1
     
 3. 	$ show collections		
 	//to show all the collections in database
+
+4. 	$ npm install <package-name>
+	//npm stands for "Node Package Manager". Node has a repository where all open source packages is stored.
+
+5.	$ db.<collection-name>.insert(<insert-object>)
+	//it will insert the given doc in the collection
+
+6.	$ db.<collection-name>.findOne()
+	//it will return the first doc of the collection
     
+7.	$ db.<collection-name>.find(<search-criteria-object>)
+	//it will return all the docs who satisfies the given criteria
+    
+8.	$ db.<collection-name>.find(<search-criteria-object>,<specified-field>)
+	//it will return all the docs who satisfies the given criteria with specified fields only
+    
+9.	$ db.<collection-name>.find({"score":{$gt:10, $lt:50}})
+	//it will return all the docs who satisfies the given criteria
+
+10.	$ db.<collection-name>.find({"name":{$type:<mongodb-data-type>}, "email":{$exists:"true"}})
+	//it will return all the docs who satisfies the given criteria
+    //$type   :will return the docs who have specific data type for given attribute
+    //$exists :will return the docs who have specific given attribute
+    
+11.	$ db.scores.find({
+                $or:[
+                         {score:{$lt:50}},
+                         {score:{$gt:90}}
+                    ]
+               })
+    //it return the docs how have score value less that 50 o greater than 90
+    
+12. $ db.scores.find({
+                $and:[
+                         {score:{$gt:50}},
+                         {score:{$lt:90}}
+                    ]
+               })
+    //it return the docs how have score value less that 90 and greater than 50
+    
+13.	$ db.products.find( { tags : "shiny" } )
+	//it tags is type of array then it will return all the docs where tags array have 'shiny' value
+    
+14. $ db.users.find( { 
+						friends : { $all : [ "Joe" , "Bob" ] }, 
+                        favorites : { $in : [ "running" , "pickles" ] } 
+                     } )
+	//$all : will return all the docs where friends array have "Joe" and "Bob"
+    //$in  : will return all the docs where favorites array have any value of the given array
+    
+15. $ db.catalog.find({
+                            price:{$gt:10000},
+                            "reviews.rating":{$gte:5}
+                      })
+	//will return all the docs where inside reviews, the sub doc of rating attribute have value >= 5
+    
+16. $ db.scores.find({"type":"exam"}).sort({"score":-1}).skip(50).limit(20)
+	//here "db.scores.find({"type":"exam"})" will return a cursor object on which we apply sort desc 
+      based on score and skip 50 from starting and only show starting 20 docs
+      
+17. $ db.scores.count(<search-criteria-obj>)
+	//it will return the count of the docs how satisfies the given condition
+    
+18.	$ db.foo.update({_id:"Texas"},{population:30000000})
+	//it will update the doc with the give doc where default _id is "Texas"
+    
+19.	$ db.foo.update({_id:"Texas"}, {$set:{population:200000}})
+	//it will update the doc by setting the updated population only where _id is "Texas"
+    
+20. $ db.foo.update({_id:"Texas"}, {$unset:{population:200000}})
+	//it will update the doc by unset the population only where _id is "Texas"
+    
+21. $ db.friends.update( { _id : "Mike" }, { $push : { interests : "skydiving" } } );
+	$ db.friends.update( { _id : "Mike" }, { $pop : { interests : -1 } } );
+	$ db.friends.update( { _id : "Mike" }, { $addToSet : { interests : "skydiving" } } );
+	$ db.friends.update( { _id : "Mike" }, { $pushAll: { interests : [ "skydiving" , "skiing" ] } } );
+    //$push	:	it will simply add the given value in the doc for the given attribute where _id matches.
+    //$pop 	:	it will simply remove the specified value in the doc for the given attribute where _id matches 
+    			since -1 is there so it will remove from the left most.
+    //$addToSet	:	it will add the value only if given value is not there in the doc. it check for duplicates
+    //$pushAll	:	it will add the value with duplicate.
+    
+22. $ db.foo.update( { username : 'bar' }, 
+					 { '$set' : { 'interests': [ 'cat' , 'dog' ] } } , 
+                     { upsert : true } );
+	//{upsert: true}	: it will update the doc if it finds in the collection. if it doesn't find it simply creates new doc
+    
+23.	$ db.foo.update( { username : 'bar' }, 
+					 { '$set' : { 'interests': [ 'cat' , 'dog' ] } } , 
+                     { multi : true } );
+	//{multi: true}	: it will update the all the matching docs.
+    
+24.	$ db.foo.remove()
+	//it will remove all the docs one by one from collection in mongodb version < 2.6
+    $ db.foo.remove(<search-object>)
+    //it will remove the doc which matches the search object
+    $ db.foo.remove({})
+    //it will remove all the docs one by one in mongodb version > 2.6 and given object is mandatory in > 2.6
+    $ db.foo.drop()
+    //it will remove the collection as well as index rather than removing the docs one by one without removing indexes
+    
+25. $ db.runCommand({getLastError : 1})
+	//it will return the last error object.
+    
+=================================================================================================================================================
 
 
-Week4
------
+Week 4
+------
 1. 	Index: 	Used to enhance the performance of the query.
 			Used to reduce the search criteria.
             Used on those attribute who has large number of data with distict values.
@@ -107,3 +211,22 @@ Week4
 
 22. $ mongostat
 	//Is the command to get the statistics of mongodb per second
+    
+=================================================================================================================================================
+
+
+Week 5
+======
+
+Aggregate :	It uses to get the docs similar to group by clause in sql.
+
+1.	$ db.products.aggregate([{
+             $group:{
+                     _id:"$category",
+                     "num_products":{$sum:1}
+                 	} 
+         }])
+	//it will return sum of all the docs according to the category.
+    
+2.	$ db.
+    
