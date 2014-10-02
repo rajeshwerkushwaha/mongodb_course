@@ -1,3 +1,53 @@
+db.messages.update({"headers.Message-ID":"<8147308.1075851042335.JavaMail.evans@thyme>"}, {$push:{"headers.To": "mrpotatohead@mongodb.com"}}, {multi: 1})
+
+db.messages.update({_id:ObjectId("542718d11f644f6e389a3eb3")}, {$push:{"headers.To": "rajesh"}})
+
+db.school.find({_id:ObjectId("542718d11f644f6e389a3eb3")}, {$push:{"headers.To": "rajesh"}})
+
+
+db.messages.aggregate([{$match:{"headers.From":"andrew.fastow@enron.com"}},{$unwind:"$headers.To"},{$group:{_id:{from:"$headers.From", to:"$headers.To"},count:{$sum:1}}}])
+
+db.messages.aggregate([{$match:{headers.from:"andrew.fastow@enron.com"},{$unwind:'$headers.To'},{$group:{_id:{from:"$headers.from"},count:{$sum:1}}}])
+
+db.messages.aggregate([
+{ $unwind:'$headers.To' },
+{
+  $group:{
+	  _id:"$_id",
+    from: "$headers.From",
+    "to":{$addToSet: "$headers.To"}
+	}
+},
+{ $unwind:'$to' },
+{
+  $group:{
+    _id: {"$from", "$to"},
+    count: {$sum: 1}
+  }
+}
+])
+
+
+
+db.school.insert({"filename" : "2",	"headers" : { "From": "ebass0@enron.com", "To" : ["ebass@enron.com","ebass2@enron.com",      "ebass1@enron.com","ebass2@enron.com"]},"mailbox" : "bass-e",	"subFolder" : "personal"})
+
+
+db.messages.aggregate([{ $unwind:'$headers.To' },{  $group:{	  _id:"$_id", "to":{$addToSet: "$headers.To"}}},{ $unwind:'$to' }])
+
+db.messages.aggregate([{$unwind:'$headers.To'},{$group:{_id:"$_id","to":{$addToSet: "$headers.To"}}},{$unwind:"$to"},{  $group:{"_id": {"$headers.From", "$to"},count: {$sum: 1}}}])
+
+db.messages.aggregate([{$unwind:'$headers.To'},{$group:{_id:"$_id","to":{$addToSet: "$headers.To"}}},{$unwind:"$to"}])
+
+db.school.aggregate([{$unwind:'$headers.To'},{$group:{_id:{id:"$_id", from:"$headers.From"}, "to":{$addToSet: "$headers.To"}}}, {$unwind:"$to"}, {$group:{_id:{from:"$_id.from", to:"$to"}, count:{$sum:1}}}]) 
+
+db.school.aggregate([
+{$unwind:'$email.address'},
+{$group:{_id:"$_id", "address": {$addToSet: "$email.address"}}},
+{$unwind:'$address'},
+{$group:{_id:{"$name", "$to"}, count:{$sum: 1} }}])
+
+db.school.aggregate([{$unwind:'$email.address'},{$group:{_id:"$_id", "address": {$addToSet: "$email.address"}}},{$unwind:'$address'},{$group:{_id:{"$name", "$address"}, count:{$sum: 1} }}])
+
 db.posts.aggregate([
 {$unwind:'$comments'},
 {$group:{
