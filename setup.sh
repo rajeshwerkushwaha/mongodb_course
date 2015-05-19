@@ -25,7 +25,7 @@ if [ $UID -ne 0 ]; then
     exit 1
 fi
 
-# Ensure the installer is launched and can only be launched on Ubuntu 14.04
+# Ensure the installer is launched and can only be launched on Ubuntu 12.04
 BITS=$(uname -m | sed 's/x86_//;s/i[3-6]86/32/')
 if [ -f /etc/lsb-release ]; then
   OS=$(cat /etc/lsb-release | grep DISTRIB_ID | sed 's/^.*=//')
@@ -66,46 +66,59 @@ echo -e ""
 
 sleep 15
 
-# Let's get the package index updated
-# This may be redundant, but there's no way to tell  
+# Update Package Index
 apt-get update
-apt-get install -y ruby1.8 rails rubygems
 
-# Installing Unzip
-apt-get install -y unzip
+# Install Dependencies
+apt-get install -y gawk g++ gcc make libc6-dev libreadline6-dev zlib1g-dev libssl-dev libyaml-dev libsqlite3-dev sqlite3 autoconf libgdbm-dev libncurses5-dev automake libtool bison pkg-config libffi-dev unzip
 
-echo "Downgrading Rubygems ... Fedena 2.3 requires v=1.3.7"
-gem install rubygems-update -v=1.3.7
-update_rubygems --version=1.3.7
+apt-get install -y gcc-4.4 g++-4.4
 
+
+# Install Ruby 1.8
+cd /tmp && wget http://cache.ruby-lang.org/pub/ruby/1.8/ruby-1.8.7-p374.tar.gz
+tar -xzvf ruby-1.8.7-p374.tar.gz
+cd ruby-1.8.7-p374
+./configure
+make CC=gcc-4.4
+make install 
+
+# Install Rubygems 1.3.7 
+cd /tmp && wget http://production.cf.rubygems.org/rubygems/rubygems-1.3.7.tgz
+tar -xzvf rubygems-1.3.7.tgz
+cd rubygems-1.3.7
+ruby setup.rb
+
+cd $home
+# Install MySQL Server / Adapter
 echo "Installing the MySQL server ..."
 sleep 2
 export DEBIAN_FRONTEND=noninteractive
-apt-get -q -y install  mysql-server mysql-client libmysql-ruby
+apt-get -q -y install  mysql-server mysql-client libmysqlclient-dev
 sleep 3
 mysqladmin -u root password foradian
 echo "MySQL password set as 'foradian'"
 sleep 2
 
-echo "Updating GEMs."
-sleep 2
+echo "Updating GEMs:"
 gem install rails -v=2.3.5 --no-ri --no-rdoc
 gem uninstall rake -Iax
 gem install rake -v=0.8.7 --no-ri --no-rdoc
+gem install mysql --no-ri --no-rdoc
 gem install i18n -v 0.4.2 --no-ri --no-rdoc
 gem install rush -v 0.6.8 --no-ri --no-rdoc
 gem install mongrel -v=1.1.5 --no-ri --no-rdoc
 
 # We securely download Fedena from the content distribution network at n3rve.com
-echo "Securely connecting to n3rve.com to download Project Fedena 2.3"
-sleep 3
+echo "Connecting to n3rve.com | Downloading Project Fedena 2.3"
+sleep 2
 echo "Access credentials sent"
 sleep 2
 wget http://cdn.n3rve.com/secure/dl/fedena/2.3/fedena_2.3.zip --user=fedena23 --password='vEf879AC5vp44Ab'
-sleep 5
+sleep 3
 echo "Un-archiving & preparing Fedena for installation"
 sleep 2
-unzip *.zip
+unzip fedena_2.3.zip
 cd ~/fedena-v2.3-bundle-linux/
 sleep 1
 rake gems:install
@@ -127,8 +140,8 @@ chmod +x script*
 sleep 1
 echo "Starting a GNU Screen session"
 sleep 2
-screen -d -m mongrel_rails start -e production -p 8088
-echo "Installation complete. Visit http://<your-server-ip.com:8088"
+screen -d -m mongrel_rails start -e production
+echo "Installation complete. Visit http://<your-server-ip.com:3000"
 echo "Login with admin / admin123."
 echo "For the professional version of Fedena, contact: n3rve@n3rve.com"
 cd ../ && rm -- "$0"
